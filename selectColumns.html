@@ -204,7 +204,7 @@
     const modalMessage = document.getElementById("modal-message");
     const loader = document.getElementById("modal-loader");
     const tryAgainButton = document.getElementById("try-again-button");
-    const backHomeButton = document.getElementById("back-home-button");
+    const backHomeMessage = document.getElementById("back-home-message");  // Reference to the <h4> message
 
     // Load CSV data from sessionStorage and parse it
     const csvData = JSON.parse(sessionStorage.getItem('csvData'));
@@ -232,8 +232,8 @@
       modalMessage.textContent = "Saving Contacts";
       loader.style.display = "block";
       tryAgainButton.style.display = "none";
-      backHomeMessage.style.display = "none";
-      
+      backHomeMessage.style.display = "none";  // Hide initially
+
       const selectedPhone = document.getElementById('phone-select').value;
       const selectedFirstName = document.getElementById('firstname-select').value;
 
@@ -253,11 +253,13 @@
           if (!response.ok) throw new Error("Failed to add record");
         }
 
+        // Data saved successfully
         loader.style.display = "none";
         modalMessage.textContent = "Data saved successfully!";
-        backHomeMessage.style.display = "block";  // Show the message
+        backHomeMessage.style.display = "block";  // Show the back-home message
 
       } catch (error) {
+        // Handle error case
         loader.style.display = "none";
         modalMessage.textContent = "An error occurred. Please try again.";
         tryAgainButton.style.display = "inline-block";
@@ -272,6 +274,7 @@
       closeModal();
       addToTable();
     }
-  </script>
+</script>
+
 </body>
 </html>
