@@ -191,7 +191,10 @@
       <div id="modal-message" class="modal-message"></div>
       <div class="modal-buttons">
         <button id="try-again-button" class="modal-button try-again" onclick="retry()">Try Again</button>
-        <button id="back-home-button" class="modal-button back-home" onclick="closeModal()"><a href="https://github.com/diwy24/csv-upload">Back to home</a></button>
+        <h4 id="back-home-message" class="modal-message">
+               Please go back to your Canva app
+        </h4>
+
       </div>
     </div>
   </div>
@@ -229,8 +232,8 @@
       modalMessage.textContent = "Saving Contacts";
       loader.style.display = "block";
       tryAgainButton.style.display = "none";
-      backHomeButton.style.display = "none";
-
+      backHomeMessage.style.display = "none";
+      
       const selectedPhone = document.getElementById('phone-select').value;
       const selectedFirstName = document.getElementById('firstname-select').value;
 
@@ -252,7 +255,7 @@
 
         loader.style.display = "none";
         modalMessage.textContent = "Data saved successfully!";
-        backHomeButton.style.display = "inline-block";
+        backHomeMessage.style.display = "block";  // Show the message
 
       } catch (error) {
         loader.style.display = "none";
