@@ -76,6 +76,29 @@
       cursor: pointer;
     }
 
+ /* Checkbox and Label Styling */
+  /* Checkbox and Paragraph Styling */
+  .checkbox-container {
+      text-align: left;
+      margin-top: 20px;
+      width: 100%;
+      display: flex;
+      gap: 10px;
+    }
+    #agreement-checkbox {
+      cursor: pointer;
+      margin-right: 8px;
+      vertical-align: top;
+      margin-bottom: 50px;
+      }
+    .checkbox-text {
+      display: inline-block;
+      font-size: 0.9rem;
+      line-height: 1.4rem;
+      color: #555;
+      max-width: 100%;
+    }
+
     /* Buttons styling */
     .button-container {
       display: flex;
@@ -170,9 +193,11 @@
   <input type="file" id="file-upload" accept=".csv" style="display:none">
 
    <!-- Agreement Checkbox and Text -->
-   <div style="margin-top: 20px;">
+   <div class="checkbox-container">
     <input type="checkbox" id="agreement-checkbox" onclick="toggleImportButton()">
-    <label for="agreement-checkbox"> I agree to the terms and conditions</label>
+    <p class="checkbox-text">
+      By checking this box, you attest to comply with all relevant regulations and guidelines under the TCPA, TSR, GDPR, and other applicable laws in communication with these contacts.
+    </p>
   </div>
   
   <!-- Buttons for Cancel and Import -->
