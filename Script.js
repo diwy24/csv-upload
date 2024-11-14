@@ -34,7 +34,20 @@ function cancelUpload() {
     fileDetails.textContent = ''; // Clear displayed file details
 }
 
-// Handle import button click
+
+  // Function to toggle the Import button based on checkbox state
+   // Toggle Import button based on checkbox state
+   function toggleImportButton() {
+    const checkbox = document.getElementById('agreement-checkbox');
+    const importButton = document.getElementById('import-button');
+    
+    // Set import button disabled property based on checkbox checked state
+    importButton.disabled = !checkbox.checked;
+
+   
+  }
+
+
 function handleImport() {
     const fileInput = document.getElementById('file-upload');
     if (fileInput.files.length) {

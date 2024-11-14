@@ -168,11 +168,17 @@
   
   <!-- File Input (hidden) -->
   <input type="file" id="file-upload" accept=".csv" style="display:none">
+
+   <!-- Agreement Checkbox and Text -->
+   <div style="margin-top: 20px;">
+    <input type="checkbox" id="agreement-checkbox" onclick="toggleImportButton()">
+    <label for="agreement-checkbox"> I agree to the terms and conditions</label>
+  </div>
   
   <!-- Buttons for Cancel and Import -->
   <div class="button-container">
     <button class="button cancel-button"  onclick="cancelUpload()">Cancel</button>
-    <button class="button import-button" onclick="handleImport()">Import</button>
+    <button class="button import-button" id="import-button" onclick="handleImport()" disabled>Import</button>
   </div>
 </div>
 

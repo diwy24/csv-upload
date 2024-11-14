@@ -178,9 +178,20 @@
           <span class="remove" onclick="removeField('first_name')">&times;</span>
         </div>
       </div>
+
+      <div class="item">
+        <label>
+          <input type="checkbox" class="checkbox" id="email-checkbox" checked>Email
+        </label>
+        <span class="arrow">→</span>
+        <div class="select-box">
+          <select id="email-select"></select>
+          <span class="remove" onclick="removeField('email')">&times;</span>
+        </div>
+      </div>
     </div>
     <div class="footer">
-      <button class="button add-button" onclick="addToTable()">Add to Table</button>
+      <button class="button add-button" onclick="addToTable()">Add Contacts</button>
     </div>
   </div>
 
@@ -222,6 +233,7 @@
 
     populateSelectOptions('phone-select');
     populateSelectOptions('firstname-select');
+    populateSelectOptions('email-select');
 
     function removeField(field) {
       document.getElementById(`${field}-checkbox`).checked = false;
@@ -236,35 +248,37 @@
 
       const selectedPhone = document.getElementById('phone-select').value;
       const selectedFirstName = document.getElementById('firstname-select').value;
+      const selectedEmail = document.getElementById('email-select').value;
 
       const dataToUpload = csvData.map(row => ({
         phone: row[selectedPhone],
-        first_name: row[selectedFirstName]
+        first_name: row[selectedFirstName],
+        email: row[selectedEmail]
       }));
 
       try {
-        for (const record of dataToUpload) {
-          const response = await fetch('https://csv-backend-6qy5.onrender.com/api/addRecord', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fields: record })
-          });
+    const uploadPromises = dataToUpload.map(record =>
+      fetch('https://csv-backend-6qy5.onrender.com/api/addRecord', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: record })
+      }).then(response => {
+        if (!response.ok) throw new Error("Failed to add record");
+      })
+    );
 
-          if (!response.ok) throw new Error("Failed to add record");
-        }
+    await Promise.all(uploadPromises);
 
-        // Data saved successfully
-        loader.style.display = "none";
-        modalMessage.textContent = "Data saved successfully!";
-        backHomeMessage.style.display = "block";  // Show the back-home message
+    loader.style.display = "none";
+    modalMessage.textContent = "Data saved successfully!";
+    backHomeMessage.style.display = "block";
 
-      } catch (error) {
-        // Handle error case
-        loader.style.display = "none";
-        modalMessage.textContent = "An error occurred. Please try again.";
-        tryAgainButton.style.display = "inline-block";
-      }
-    }
+  } catch (error) {
+    loader.style.display = "none";
+    modalMessage.textContent = "An error occurred. Please try again.";
+    tryAgainButton.style.display = "inline-block";
+  }
+}
 
     function closeModal() {
       modal.style.display = "none";
