@@ -136,90 +136,104 @@
 </head>
 <body>
 
-<div class="progress-container">
-  <!-- Close Button -->
-  <span class="close-btn" onclick="closeWindow()">&times;</span>
-
-  <!-- Title -->
-  <div class="title">Importing <span id="row-count">0</span> Prospects Into QONVO - ICP1</div>
-
-  <!-- Progress Status -->
-  <div class="status">0% Done</div>
-
-  <!-- Progress Bar -->
-  <div class="progress-bar">
-    <div class="progress-fill" id="progress-fill"></div>
+  <div class="progress-container">
+    <!-- Close Button -->
+    <span class="close-btn" onclick="closeWindow()">&times;</span>
+  
+    <!-- Title -->
+    <div class="title">Importing <span id="row-count">0</span> Prospects Into QONVO - ICP1</div>
+  
+    <!-- Progress Status -->
+    <div class="status">0% Done</div>
+  
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  
+    <!-- Details -->
+    <div class="details" id="import-details">
+      0 scanned, 0 success, 0 duplicates, 0 false positives
+    </div>
+  
+    <!-- Message -->
+    <div id="message" style="display: none; margin-bottom: 20px; color: red; font-weight: bold; text-align: center;">
+      Please go back to your Canva app
+    </div>
+  
+    <!-- Action Buttons -->
+    <div class="button-container">
+      <button id="stop-button" class="button stop-button" onclick="stopImport()">Stop Import</button>
+    </div>
   </div>
-
-  <!-- Details -->
-  <div class="details" id="import-details">
-    0 scanned, 0 success, 0 duplicates, 0 false positives
-  </div>
-
-  <!-- Action Buttons -->
-  <div class="button-container">
-    <button class="button add-button" onclick="addToCampaign()">Add this import to a campaign</button>
-    <button class="button stop-button" onclick="stopImport()">Stop Import</button>
-  </div>
-</div>
-
-<script>
-let interval;
-
-function closeWindow() {
-    window.close();
-}
-
-function stopImport() {
-    clearInterval(interval);
-    document.querySelector('.status').textContent = "Import stopped.";
-}
-
-function startImport() {
-    const csvData = JSON.parse(sessionStorage.getItem('csvData'));
-    if (!csvData || csvData.length === 0) {
-        alert("No CSV data found.");
-        return;
-    }
-
-    document.getElementById('row-count').textContent = csvData.length;
-
-    let scanned = 0, success = 0;
-
-    interval = setInterval(() => {
-        if (scanned < csvData.length) {
-            const row = csvData[scanned];
-            scanned++;
-
-            // Each row is counted as a success
-            success++;
-
-            // Update the progress bar and status text
-            document.querySelector('.status').textContent = `${Math.round((scanned / csvData.length) * 100)}% Done`;
-            document.getElementById('progress-fill').style.width = `${(scanned / csvData.length) * 100}%`;
-            document.getElementById('import-details').textContent = `${scanned} scanned, ${success} success, 0 duplicates, 0 false positives`;
-
-        } else {
-            clearInterval(interval);
-            console.log("Import completed.");
-        }
-    }, 100);
-}
-
-function addToCampaign() {
-    const csvData = JSON.parse(sessionStorage.getItem('csvData'));
-
-    if (csvData && csvData.length > 0) {
-        // Route to the new page with the CSV data in sessionStorage
-        window.location.href = "selectColumns.html";
-    } else {
-        alert("No CSV data to add to campaign.");
-    }
-}
-
-// Start the import process when the page loads
-window.onload = startImport;
-</script>
+  
+  <script>
+  let interval;
+  
+  function closeWindow() {
+      window.close();
+  }
+  
+  function stopImport() {
+      clearInterval(interval);
+  
+      // Display the message
+      const message = document.getElementById('message');
+      message.style.display = 'block';
+  
+      // Hide the stop button
+      const stopButton = document.getElementById('stop-button');
+      stopButton.style.display = 'none';
+  
+      // Update status text
+      document.querySelector('.status').textContent = "Import stopped.";
+  }
+  
+  function startImport() {
+      const csvData = JSON.parse(sessionStorage.getItem('csvData'));
+      if (!csvData || csvData.length === 0) {
+          alert("No CSV data found.");
+          return;
+      }
+  
+      document.getElementById('row-count').textContent = csvData.length;
+  
+      let scanned = 0, success = 0;
+  
+      interval = setInterval(() => {
+          if (scanned < csvData.length) {
+              const row = csvData[scanned];
+              scanned++;
+  
+              // Each row is counted as a success
+              success++;
+  
+              // Update the progress bar and status text
+              document.querySelector('.status').textContent = `${Math.round((scanned / csvData.length) * 100)}% Done`;
+              document.getElementById('progress-fill').style.width = `${(scanned / csvData.length) * 100}%`;
+              document.getElementById('import-details').textContent = `${scanned} scanned, ${success} success, 0 duplicates, 0 false positives`;
+  
+          } else {
+              clearInterval(interval);
+  
+              // Hide the Stop Import button
+              const stopButton = document.getElementById('stop-button');
+              stopButton.style.display = 'none';
+  
+              // Display the message
+              const message = document.getElementById('message');
+              message.style.display = 'block';
+  
+              console.log("Import completed.");
+          }
+      }, 100);
+  }
+  
+  // Start the import process when the page loads
+  window.onload = startImport;
+  </script>
+  
+  
 
 </body>
 </html>
