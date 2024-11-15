@@ -51,7 +51,7 @@ function cancelUpload() {
 function handleImport() {
     const fileInput = document.getElementById('file-upload');
     if (fileInput.files.length) {
-        window.location.href = 'importCSV.html';
+        window.location.href = 'selectColumns.html';
     } else {
         alert("Please upload a CSV file before importing.");
     }

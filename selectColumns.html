@@ -202,9 +202,7 @@
       <div id="modal-message" class="modal-message"></div>
       <div class="modal-buttons">
         <button id="try-again-button" class="modal-button try-again" onclick="retry()">Try Again</button>
-        <h4 id="back-home-message" class="modal-message">
-               Please go back to your Canva app
-        </h4>
+       
 
       </div>
     </div>
@@ -215,7 +213,7 @@
     const modalMessage = document.getElementById("modal-message");
     const loader = document.getElementById("modal-loader");
     const tryAgainButton = document.getElementById("try-again-button");
-    const backHomeMessage = document.getElementById("back-home-message");  // Reference to the <h4> message
+      // Reference to the <h4> message
 
     // Load CSV data from sessionStorage and parse it
     const csvData = JSON.parse(sessionStorage.getItem('csvData'));
@@ -244,7 +242,7 @@
       modalMessage.textContent = "Saving Contacts";
       loader.style.display = "block";
       tryAgainButton.style.display = "none";
-      backHomeMessage.style.display = "none";  // Hide initially
+     
 
       const selectedPhone = document.getElementById('phone-select').value;
       const selectedFirstName = document.getElementById('firstname-select').value;
@@ -272,6 +270,11 @@
     loader.style.display = "none";
     modalMessage.textContent = "Data saved successfully!";
     backHomeMessage.style.display = "block";
+
+    // Navigate to another page after successful save
+  setTimeout(() => {
+    window.location.href = 'importCSV.html'; // Replace with the actual URL
+  }, 2000); 
 
   } catch (error) {
     loader.style.display = "none";
