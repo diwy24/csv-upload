@@ -191,7 +191,7 @@
       </div>
     </div>
     <div class="footer">
-      <button class="button add-button" onclick="addToTable()">Add Contacts</button>
+      <button class="button add-button" onclick="addToTable()" >Add Contacts</button>
     </div>
   </div>
 
@@ -209,96 +209,140 @@
   </div>
 
   <script>
-    const modal = document.getElementById("modal");
-    const modalMessage = document.getElementById("modal-message");
-    const loader = document.getElementById("modal-loader");
-    const tryAgainButton = document.getElementById("try-again-button");
-      // Reference to the <h4> message
+ // Initialize modal elements
+const modal = document.getElementById('modal');
+const modalMessage = document.getElementById('modal-message');
+const loader = document.getElementById('modal-loader');
+const tryAgainButton = document.getElementById('try-again-button');
+const addButton = document.querySelector('.add-button'); // Select the "Add Contacts" button
 
-    // Load CSV data from sessionStorage and parse it
-    const csvData = JSON.parse(sessionStorage.getItem('csvData'));
-    const headers = csvData && csvData.length ? Object.keys(csvData[0]) : [];
+// Retrieve CSV data from sessionStorage
+let csvData = [];
+const csvDataString = sessionStorage.getItem('csvData');
 
-    function populateSelectOptions(selectId) {
-      const selectElement = document.getElementById(selectId);
-      headers.forEach(header => {
-        const option = document.createElement('option');
-        option.value = header;
-        option.textContent = header;
-        selectElement.appendChild(option);
-      });
-    }
+if (csvDataString) {
+  try {
+    csvData = JSON.parse(csvDataString); // Parse the JSON string to an array of objects
+    console.log('CSV Data retrieved:', csvData);
+  } catch (error) {
+    console.error('Error parsing CSV data from sessionStorage:', error);
+  }
+}
 
-    populateSelectOptions('phone-select');
-    populateSelectOptions('firstname-select');
-    populateSelectOptions('email-select');
+const headers = csvData.length > 0 ? Object.keys(csvData[0]) : [];
 
-    function removeField(field) {
-      document.getElementById(`${field}-checkbox`).checked = false;
-    }
+function populateSelectOptions(selectId) {
+  const selectElement = document.getElementById(selectId);
+  if (!selectElement) return;
 
-    async function addToTable() {
-      modal.style.display = "flex";
-      modalMessage.textContent = "Saving Contacts";
-      loader.style.display = "block";
-      tryAgainButton.style.display = "none";
-     
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = '--Select--';
+  placeholder.disabled = true;
+  placeholder.selected = true;
+  selectElement.appendChild(placeholder);
 
-      const selectedPhone = document.getElementById('phone-select').value;
-      const selectedFirstName = document.getElementById('firstname-select').value;
-      const selectedEmail = document.getElementById('email-select').value;
+  headers.forEach(header => {
+    const option = document.createElement('option');
+    option.value = header;
+    option.textContent = header;
+    selectElement.appendChild(option);
+  });
+}
 
-      const dataToUpload = csvData.map(row => ({
-        phone: row[selectedPhone],
-        first_name: row[selectedFirstName],
-        email: row[selectedEmail]
-      }));
+// Populate dropdowns
+populateSelectOptions('phone-select');
+populateSelectOptions('firstname-select');
+populateSelectOptions('email-select');
 
-      console.log('Data being sent:', dataToUpload);
+// Form validation
+function validateForm() {
+  const selectedPhone = document.getElementById('phone-select').value;
+  const selectedFirstName = document.getElementById('firstname-select').value;
 
-      try {
+  addButton.disabled = !(selectedPhone && selectedFirstName); // Enable if both are selected
+}
+
+// Attach event listeners for validation
+['phone-select', 'firstname-select', 'email-select'].forEach(selectId =>
+  document.getElementById(selectId).addEventListener('change', validateForm)
+);
+
+// Initial validation
+validateForm();
+
+function removeField(field) {
+  const checkbox = document.getElementById(`${field}-checkbox`);
+  const selectBox = document.getElementById(`${field}-select`);
+  if (checkbox) checkbox.checked = false;
+  if (selectBox) selectBox.value = '';
+  validateForm();
+}
+
+
+async function addToTable() {
+  const selectedPhone = document.getElementById('phone-select').value;
+  const selectedFirstName = document.getElementById('firstname-select').value;
+
+  // Check if both fields are selected
+  if (!selectedPhone || !selectedFirstName) {
+    // Show alert first before proceeding
+    alert('Phone Number and First Name are required. Please select them to proceed.');
+    return;
+  }
+
+  // Show the modal after the alert
+  modal.style.display = 'flex';
+  modalMessage.textContent = 'Saving Contacts';
+  loader.style.display = 'block';
+  tryAgainButton.style.display = 'none';
+
+  const selectedEmail = document.getElementById('email-select').value;
+
+  const dataToUpload = csvData.map(row => ({
+    phone: row[selectedPhone] || '',
+    first_name: row[selectedFirstName] || '',
+    email: row[selectedEmail] || '',
+  }));
+  try {
     const uploadPromises = dataToUpload.map(record =>
       fetch('https://csv-backend-6qy5.onrender.com/api/addRecord', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fields: record })
+        body: JSON.stringify({ fields: record }),
       }).then(response => {
-        if (!response.ok) {
-          console.error('Response error:', response.statusText);
-          throw new Error("Failed to add record");
-        }
-      
+        if (!response.ok) throw new Error('Failed to add record');
       })
     );
 
     await Promise.all(uploadPromises);
 
-    loader.style.display = "none";
-    modalMessage.textContent = "Data saved successfully!";
-    
-
-    // Navigate to another page after successful save
-  setTimeout(() => {
-    window.location.href = 'importCSV.html'; // Replace with the actual URL
-  }, 2000); 
-
+    loader.style.display = 'none';
+    modalMessage.textContent = 'Data saved successfully!';
+    setTimeout(() => {
+      window.location.href = 'importCSV.html';
+    }, 2000);
   } catch (error) {
     console.error('Error occurred:', error.message);
-    loader.style.display = "none";
-    modalMessage.textContent = "An error occurred. Please try again.";
-    tryAgainButton.style.display = "inline-block";
+    loader.style.display = 'none';
+    modalMessage.textContent = 'An error occurred. Please try again.';
+    tryAgainButton.style.display = 'inline-block';
   }
 }
 
-    function closeModal() {
-      modal.style.display = "none";
-    }
+function closeModal() {
+  modal.style.display = 'none';
+}
 
-    function retry() {
-      closeModal();
-      addToTable();
-    }
-</script>
+function retry() {
+  closeModal();
+  addToTable();
+}
+
+
+  </script>
+  
+  
 
 </body>
 </html>
