@@ -154,7 +154,7 @@
     <!-- Details -->
     <div class="details" id="import-details">
       0 numbers, 0 valid, 0 duplicates, 0 invalid
-    </div>
+    </div> 
   
     <!-- Message -->
     <div id="message" style="display: none; margin-bottom: 20px; color: red; font-weight: bold; text-align: center;">
@@ -168,70 +168,74 @@
   </div>
   
   <script>
-  let interval;
+    let interval; // Holds the interval ID for the import process
+    let numbers = 0; // Tracks the number of rows processed
+    let valid = 0; // Tracks the number of valid rows
   
-  function closeWindow() {
+    function closeWindow() {
       window.close();
-  }
+    }
   
-  function stopImport() {
+    function stopImport() {
       clearInterval(interval);
   
       // Display the message
-      const message = document.getElementById('message');
-      message.style.display = 'block';
+      const message = document.getElementById("message");
+      message.style.display = "block";
   
       // Hide the stop button
-      const stopButton = document.getElementById('stop-button');
-      stopButton.style.display = 'none';
+      const stopButton = document.getElementById("stop-button");
+      stopButton.style.display = "none";
   
       // Update status text
-      document.querySelector('.status').textContent = "Import stopped.";
-  }
+      document.querySelector(".status").textContent = "Import stopped.";
+    }
   
-  function startImport() {
-      const csvData = JSON.parse(sessionStorage.getItem('csvData'));
+    function startImport() {
+      const csvData = JSON.parse(sessionStorage.getItem("csvData"));
       if (!csvData || csvData.length === 0) {
-          alert("No CSV data found.");
-          return;
+        alert("No CSV data found.");
+        return;
       }
   
-      document.getElementById('row-count').textContent = csvData.length;
-  
-      let scanned = 0, success = 0;
+      // Set the row count display
+      document.getElementById("row-count").textContent = csvData.length;
   
       interval = setInterval(() => {
-          if (scanned < csvData.length) {
-              const row = csvData[scanned];
-              scanned++;
+        if (numbers < csvData.length) {
+          // Process each row
+          numbers++;
+          valid++;
   
-              // Each row is counted as a success
-              success++;
+          // Update progress bar and status text
+          const percentage = Math.round((numbers / csvData.length) * 100);
+          document.querySelector(".status").textContent = `${percentage}% Done`;
+          document.getElementById("progress-fill").style.width = `${percentage}%`;
   
-              // Update the progress bar and status text
-              document.querySelector('.status').textContent = `${Math.round((scanned / csvData.length) * 100)}% Done`;
-              document.getElementById('progress-fill').style.width = `${(scanned / csvData.length) * 100}%`;
-              document.getElementById('import-details').textContent = `${scanned} scanned, ${success} success, 0 duplicates, 0 false positives`;
+          // Update details text
+          document.getElementById(
+            "import-details"
+          ).textContent = `${numbers} numbers, ${valid} valid, 0 duplicates, 0 invalid`;
+        } else {
+          clearInterval(interval);
   
-          } else {
-              clearInterval(interval);
+          // Display success message
+          const message = document.getElementById("message");
+          message.style.display = "block";
   
-              // Hide the Stop Import button
-              const stopButton = document.getElementById('stop-button');
-              stopButton.style.display = 'none';
+          // Hide the Stop Import button
+          const stopButton = document.getElementById("stop-button");
+          stopButton.style.display = "none";
   
-              // Display the message
-              const message = document.getElementById('message');
-              message.style.display = 'block';
+          console.log("Import completed.");
+        }
+      }, 100); // Adjust this interval as necessary
+    }
   
-              console.log("Import completed.");
-          }
-      }, 100);
-  }
-  
-  // Start the import process when the page loads
-  window.onload = startImport;
+    // Start the import process when the page loads
+    window.onload = startImport;
   </script>
+  
   
   
 
