@@ -191,57 +191,66 @@
       // Update status text
       document.querySelector(".status").textContent = "Import stopped.";
     }
-
     function startImport() {
-      const csvData = JSON.parse(sessionStorage.getItem("csvData"));
-      if (!csvData || csvData.length === 0) {
-        alert("No CSV data found.");
-        return;
+  const csvData = JSON.parse(sessionStorage.getItem("csvData"));
+  if (!csvData || csvData.length === 0) {
+    alert("No CSV data found.");
+    return;
+  }
+
+  const phoneSet = new Set(); // To track duplicates
+  const duplicates = new Set(); // To store actual duplicate numbers
+
+  // Set the row count display
+  document.getElementById("row-count").textContent = csvData.length;
+
+  interval = setInterval(() => {
+    if (numbers < csvData.length) {
+      // Process each row
+      const row = csvData[numbers];
+      const phoneNumber = row.phoneNumber; // Assuming phone number is under 'phoneNumber' key
+
+      // Validate phone number format
+      const phoneRegex = /^\+1\d{10,15}$/; // +1 followed by 10–15 digits
+      if (phoneRegex.test(phoneNumber)) {
+        // Check for duplicates
+        if (phoneSet.has(phoneNumber)) {
+          duplicates.add(phoneNumber);
+        } else {
+          phoneSet.add(phoneNumber);
+          valid++;
+        }
+      } else {
+        invalid++;
       }
 
-      // Set the row count display
-      document.getElementById("row-count").textContent = csvData.length;
+      // Update progress bar and status text
+      numbers++;
+      const percentage = Math.round((numbers / csvData.length) * 100);
+      document.querySelector(".status").textContent = `${percentage}% Done`;
+      document.getElementById("progress-fill").style.width = `${percentage}%`;
 
-      interval = setInterval(() => {
-        if (numbers < csvData.length) {
-          // Process each row
-          const row = csvData[numbers];
-          const phoneNumber = row.phoneNumber; // Assuming phone number is under 'phoneNumber' key
+      // Update details text
+      document.getElementById(
+        "import-details"
+      ).textContent = `${numbers} numbers, ${valid} valid, ${duplicates.size} duplicates, ${invalid} invalid`;
 
-          // Validate phone number format
-          const phoneRegex = /^\+1\d{15}$/; // Regex for validating phone number format (+1 followed by 15 digits)
-          if (phoneRegex.test(phoneNumber)) {
-            valid++;
-          } else {
-            invalid++;
-          }
+    } else {
+      clearInterval(interval);
 
-          // Update progress bar and status text
-          numbers++;
-          const percentage = Math.round((numbers / csvData.length) * 100);
-          document.querySelector(".status").textContent = `${percentage}% Done`;
-          document.getElementById("progress-fill").style.width = `${percentage}%`;
+      // Display success message
+      const message = document.getElementById("message");
+      message.style.display = "block";
 
-          // Update details text
-          document.getElementById(
-            "import-details"
-          ).textContent = `${numbers} numbers, ${valid} valid, 0 duplicates, ${invalid} invalid`;
+      // Hide the Stop Import button
+      const stopButton = document.getElementById("stop-button");
+      stopButton.style.display = "none";
 
-        } else {
-          clearInterval(interval);
-
-          // Display success message
-          const message = document.getElementById("message");
-          message.style.display = "block";
-
-          // Hide the Stop Import button
-          const stopButton = document.getElementById("stop-button");
-          stopButton.style.display = "none";
-
-          console.log("Import completed.");
-        }
-      }, 100); // Adjust this interval as necessary
+      console.log("Import completed.");
     }
+  }, 100); // Adjust this interval as necessary
+}
+
 
     // Start the import process when the page loads
     window.onload = startImport;
