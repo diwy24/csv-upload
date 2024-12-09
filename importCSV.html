@@ -211,18 +211,18 @@
       const phoneNumber = row.phoneNumber; // Assuming phone number is under 'phoneNumber' key
 
       // Validate phone number format
-      const phoneRegex = /^\+1\d{10,15}$/; // +1 followed by 10–15 digits
-      if (phoneRegex.test(phoneNumber)) {
-        // Check for duplicates
-        if (phoneSet.has(phoneNumber)) {
-          duplicates.add(phoneNumber);
+      const phoneRegex = /^\+\d{9,15}$/; // '+' followed by 9–15 digits
+        if (phoneRegex.test(phoneNumber)) {
+          // Check for duplicates
+          if (phoneSet.has(phoneNumber)) {
+            duplicates.add(phoneNumber);
+          } else {
+            phoneSet.add(phoneNumber);
+            valid++;
+          }
         } else {
-          phoneSet.add(phoneNumber);
-          valid++;
+          invalid++;
         }
-      } else {
-        invalid++;
-      }
 
       // Update progress bar and status text
       numbers++;
